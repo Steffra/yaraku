@@ -14,7 +14,7 @@ services:
       APP_KEY: ayGbuqVXJakHHvMTZCjKqzhVqMNsHMQs
       LOG_CHANNEL: stderr
     ports:
-    - '80:80'
+    - '8080:80'
     volumes:
     - ./src:/var/www/html
 
@@ -22,10 +22,10 @@ services:
     image: node:20
     container_name: frontend
     working_dir: /app
-    volumes:     
+    volumes:
       - ./frontend:/app
     ports:
-      - '8080:5173'
+      - '80:5173'
     command: >
       sh -c "
       npm install &&
