@@ -17,12 +17,25 @@ class BookController extends Controller
         $this->bookService = $bookService;
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $books = $this->bookService->getBooks();
+        $sortBy = $request->query('sortBy', 'id');
+        $sortOrder = $request->query('sortOrder', 'asc'); 
+    
+        $validator = Validator::make($request->all(), [
+            'sortBy' => 'in:id,title,author',
+            'sortOrder' => 'in:asc,desc',
+        ]);
+    
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], 422);
+        }
+    
+        $books = $this->bookService->getBooks($sortBy, $sortOrder);
+    
         return response()->json($books);
     }
-
+    
     public function store(Request $request)
     {
         $this->validate($request, [

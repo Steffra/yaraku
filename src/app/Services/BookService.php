@@ -7,9 +7,9 @@ use App\Book;
 class BookService
 {
 
-    public function getBooks(): array
+    public function getBooks(string $sortBy, string $sortOrder): array
     {
-        $books = Book::all();
+        $books = Book::orderBy($sortBy, $sortOrder)->get();
         return ['data' => $books->toArray()];
     }
     
