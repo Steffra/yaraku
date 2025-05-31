@@ -25,6 +25,32 @@ class BookApiTest extends TestCase
         $response->assertJsonFragment(['title' => 'The Great Gatsby']);
         $response->assertJsonFragment(['author' => 'George Orwell']);
     }
+    
+    public function test_it_can_filter_and_sort_books()
+    {
+        $response = $this->get('/api/books?author=George');
+        $response->assertStatus(200);
+        $response->assertJsonCount(1);
+        $response->assertJsonFragment(['title' => '1984']);
+        $response->assertJsonFragment(['author' => 'George Orwell']);
+
+        $response = $this->get('/api/books?title=Great');
+        $response->assertStatus(200);
+        $response->assertJsonCount(1);
+        $response->assertJsonFragment(['title' => 'The Great Gatsby']);
+
+        $response = $this->get('/api/books?sortBy=title&sortOrder=asc');
+        $response->assertStatus(200);
+        $books = $response->json();
+        $this->assertEquals('1984', $books[0]['title']);
+        $this->assertEquals('The Great Gatsby', $books[1]['title']);
+
+        $response = $this->get('/api/books?sortBy=title&sortOrder=desc');
+        $response->assertStatus(200);
+        $books = $response->json();
+        $this->assertEquals('The Great Gatsby', $books[0]['title']);
+        $this->assertEquals('1984', $books[1]['title']);
+    }
 
     public function test_it_can_create_a_new_book()
     {
@@ -115,4 +141,80 @@ XML;
 
         $this->assertEquals($expectedXml, $response->getContent());
     }
+
+    public function test_it_returns_validation_errors_when_sorting_books_with_invalid_data()
+    {
+        $response = $this->get('/api/books?sortBy=invalid&sortOrder=asc');
+
+        $response->assertStatus(422);
+        $response->assertJsonFragment([
+            'error' => [
+                'sortBy' => ['The selected sort by is invalid.'],
+            ],
+        ]);
+
+        $response = $this->get('/api/books?sortBy=title&sortOrder=invalid');
+
+        $response->assertStatus(422);
+        $response->assertJsonFragment([
+            'error' => [
+                'sortOrder' => ['The selected sort order is invalid.'],
+            ],
+        ]);
+    }
+    
+    public function test_it_returns_validation_errors_when_creating_a_book_with_invalid_data()
+    {
+        $response = $this->postJson('/api/books', [
+            'title' => '', 
+                'author' => '', 
+            ]);
+
+        $response->assertStatus(422);
+        $response->assertJsonFragment([
+            'errors' => [
+                'title' => ['The title field is required.'],
+                'author' => ['The author field is required.'],
+            ],
+        ]);
+    }
+
+    public function test_it_returns_an_error_when_updating_a_non_existent_book()
+    {
+        $response = $this->put('/api/books/999', [
+            'author' => 'Updated Author',
+        ]);
+
+        $response->assertStatus(422);
+    }
+
+    public function test_it_returns_an_error_when_deleting_a_non_existent_book()
+    {
+        $response = $this->delete('/api/books/999');
+
+        $response->assertStatus(422); 
+    }
+
+    public function test_it_returns_validation_errors_when_exporting_books_with_invalid_data()
+    {
+        $response = $this->get('/api/books/export/invalid?fields[]=title&fields[]=author');
+
+        $response->assertStatus(422);
+        $response->assertJsonFragment([
+            'error' => [
+                'type' => ['The selected type is invalid.'],
+            ],
+        ]);
+
+        $response = $this->get('/api/books/export/csv');
+
+        $response->assertStatus(422);
+        $response->assertJsonFragment([
+            'error' => [
+                'fields' => ['The fields field is required.'],
+            ],
+        ]);
+    }
+
+
 }
