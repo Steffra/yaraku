@@ -18,4 +18,9 @@ class BookService
         return Book::create($data);
     }
 
+    public function deleteBook(int $id): void
+    {
+        $book = Book::findOrFail($id);
+        $book->delete();
+    }
 }

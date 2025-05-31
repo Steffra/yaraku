@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Book;
 use App\Services\BookService;
+use Illuminate\Support\Facades\Validator;
 
 class BookController extends Controller
 {
@@ -32,4 +33,18 @@ class BookController extends Controller
         return response()->json($book, 201);
     }
 
+    public function destroy($id)
+    {
+        $validator = Validator::make(['id' => $id], [
+            'id' => 'required|integer|exists:books,id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], 422);
+        }
+
+        $this->bookService->deleteBook($id);
+
+        return response()->json(null, 204);
+    } 
 }
