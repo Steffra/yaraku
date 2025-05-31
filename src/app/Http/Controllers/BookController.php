@@ -21,7 +21,10 @@ class BookController extends Controller
     {
         $sortBy = $request->query('sortBy', 'id');
         $sortOrder = $request->query('sortOrder', 'asc'); 
-    
+        
+        $author = $request->query('author', '');
+        $title = $request->query('title', '');
+
         $validator = Validator::make($request->all(), [
             'sortBy' => 'in:id,title,author',
             'sortOrder' => 'in:asc,desc',
@@ -31,11 +34,11 @@ class BookController extends Controller
             return response()->json(['error' => $validator->errors()], 422);
         }
     
-        $books = $this->bookService->getBooks($sortBy, $sortOrder);
+        $books = $this->bookService->getBooks($sortBy, $sortOrder, $author, $title);
     
         return response()->json($books);
     }
-    
+
     public function store(Request $request)
     {
         $this->validate($request, [

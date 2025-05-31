@@ -7,11 +7,23 @@ use App\Book;
 class BookService
 {
 
-    public function getBooks(string $sortBy, string $sortOrder): array
+    public function getBooks(string $sortBy, string $sortOrder, string $authorFilter = '', string $titleFilter = ''): array
     {
-        $books = Book::orderBy($sortBy, $sortOrder)->get();
-        return ['data' => $books->toArray()];
+        $query = Book::query();
+
+        if ($authorFilter) {
+            $query->where('author', 'like', '%' . $authorFilter . '%');
+        }
+
+        if ($titleFilter) {
+            $query->where('title', 'like', '%' . $titleFilter . '%');
+        }
+
+        $books = $query->orderBy($sortBy, $sortOrder)->get();
+
+        return $books->toArray();
     }
+   
     
     public function createBook(array $data): Book
     {
