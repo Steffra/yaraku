@@ -23,4 +23,13 @@ class BookService
         $book = Book::findOrFail($id);
         $book->delete();
     }
+
+    public function updateAuthorOfBook(int $id, string $author): Book
+    {
+        $book = Book::findOrFail($id);
+        $book->author = $author;
+        $book->save();
+        return $book;
+    }
+
 }

@@ -47,4 +47,24 @@ class BookController extends Controller
 
         return response()->json(null, 204);
     } 
+
+    public function update(Request $request, $id)
+    {
+
+        $this->validate($request, [
+            'author' => 'required|string|max:255',
+        ]);
+
+        $validator = Validator::make(['id' => $id], [
+            'id' => 'required|integer|exists:books,id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], 422);
+        }
+
+        $book = $this->bookService->updateAuthorOfBook($id, $request->input('author'));
+
+        return response()->json($book, 200);
+    }
 }
