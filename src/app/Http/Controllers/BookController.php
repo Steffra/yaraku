@@ -5,16 +5,19 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Book;
 use App\Services\BookService;
+use App\Services\ExportService;
 use Illuminate\Support\Facades\Validator;
 
 class BookController extends Controller
 {
 
     protected $bookService;
+    protected $exportService;
 
-    public function __construct(BookService $bookService)
+    public function __construct(BookService $bookService, ExportService $exportService)
     {
         $this->bookService = $bookService;
+        $this->exportService = $exportService;
     }
 
     public function index(Request $request)
@@ -82,5 +85,27 @@ class BookController extends Controller
         $book = $this->bookService->updateAuthorOfBook($id, $request->input('author'));
 
         return response()->json($book, 200);
+    }
+
+    public function export(Request $request, string $type)
+    {
+        $validator = Validator::make(array_merge($request->all(), ['type' => $type]), [
+            'type' => 'required|in:csv,xml',
+            'fields' => 'required|array',
+            'fields.*' => 'in:author,title',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], 422);
+        }
+
+        $fields = $request->input('fields');
+
+        $content = $this->exportService->export($type, $fields);
+        
+        return response($content, 200, [
+            'Content-Type' => $type === 'csv' ? 'text/csv' : 'application/xml',
+            'Content-Disposition' => "attachment; filename=export." . $type,
+        ]);
     }
 }
