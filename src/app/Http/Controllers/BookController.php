@@ -22,5 +22,14 @@ class BookController extends Controller
         return response()->json($books);
     }
 
- 
+    public function store(Request $request)
+    {
+        $this->validate($request, [
+            'title' => 'required|string|max:255',
+            'author' => 'required|string|max:255',
+        ]);
+        $book = $this->bookService->createBook($request->all());
+        return response()->json($book, 201);
+    }
+
 }
