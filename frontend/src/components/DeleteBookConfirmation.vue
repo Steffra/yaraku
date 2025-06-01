@@ -31,8 +31,8 @@ const handleDelete = async () => {
     <n-card title="Delete Book" :bordered="false">
       <p>Are you sure you want to delete the book "{{ props.book?.title }}"?</p>
       <div class="footer">
-        <n-button type="error" :loading="isSubmitting" @click="handleDelete">Delete</n-button>
         <n-button type="default" @click="emit('close')">Cancel</n-button>
+        <n-button type="error" :loading="isSubmitting" @click="handleDelete">Delete</n-button>
       </div>
     </n-card>
   </n-modal>

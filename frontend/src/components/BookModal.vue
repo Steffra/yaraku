@@ -75,16 +75,16 @@ watch(
   <n-modal :preset="'dialog'" v-model:show="isModalVisible" @close="closeModal">
     <n-card :title="props.mode === 'create' ? 'Add New Book' : 'Edit Book'" :bordered="false">
       <n-form-item label="Title">
-        <n-input v-model:value="title" placeholder="Enter book title" :disabled="props.mode === 'edit'" />
+        <n-input v-model:value="title" placeholder="Enter book title" :disabled="props.mode === 'edit'" :required="true" />
       </n-form-item>
       <n-form-item label="Author">
         <n-input v-model:value="author" placeholder="Enter book author" />
       </n-form-item>
       <div class="footer">
+        <n-button type="tertiary" @click="closeModal">Cancel</n-button>
         <n-button secondary type="primary" :loading="isSubmitting" :disabled="isSubmitting" @click="handleSubmit">
           {{ props.mode === 'create' ? 'Submit' : 'Update' }}
         </n-button>
-        <n-button type="tertiary" @click="closeModal">Cancel</n-button>
       </div>
     </n-card>
   </n-modal>
