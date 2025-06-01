@@ -1,17 +1,18 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
-import { ref } from 'vue'
-import { NButton, NTable, NCard, NModal } from 'naive-ui';
+import { ref, watch } from 'vue'
+import { NButton, NTable, NCard, NModal, NInput } from 'naive-ui';
 import { useBookActions } from './composables/useBookActions'
 import HelloWorld from './components/HelloWorld.vue'
 import BookModal from './components/BookModal.vue'
 import DeleteBookConfirmation from './components/DeleteBookConfirmation.vue'
 
-const { books, fetchBooks } = useBookActions()
+const { books, fetchBooks, } = useBookActions()
 const modalMode = ref(null)
 const selectedBook = ref(null)
 const isDeleteModalVisible = ref(false)
-
+const titleFilter = ref('')
+const authorFilter = ref('')
 const openCreateModal = () => {
   modalMode.value = 'create'
   selectedBook.value = null
@@ -31,14 +32,21 @@ const closeModals = () => {
   isDeleteModalVisible.value = false
   modalMode.value = null
   selectedBook.value = null
-  fetchBooks()
+  refreshList()
 }
 
-fetchBooks()
+const refreshList = () => {
+  fetchBooks(titleFilter.value, authorFilter.value)
+}
+
+watch([titleFilter, authorFilter], ([newTitle, newAuthor]) => {
+  refreshList()
+}, { immediate: true })
+
 </script>
 
 <template>
-    <main v-if="books.length > 0">
+    <main >
       <div class="create-button-wrapper">
         <n-button secondary type="primary" size="large" @click="openCreateModal">
           New book
@@ -47,12 +55,21 @@ fetchBooks()
       <n-table :bordered="true" :single-line="false">
         <thead>
           <tr>
+            <th>
+              <n-input v-model:value="titleFilter" placeholder="Title filter" width="100%" />
+            </th>
+            <th>
+              <n-input v-model:value="authorFilter" placeholder="Author filter" />
+            </th>
+            <th></th>
+          </tr>
+          <tr>
             <th>Title</th>
             <th>Author</th>
             <th></th>
           </tr>
         </thead>
-        <tbody>
+        <tbody v-if="books.length > 0">
           <tr v-for="book in books" :key="book.id">
             <td>{{ book.title }}</td>
             <td>{{ book.author }}</td>
@@ -81,13 +98,12 @@ fetchBooks()
 <style scoped>
 
 main {
-  min-height: 100dvh;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   margin-right:1rem;
   margin-left:1rem;
+  padding-top:10rem;
 
   .create-button-wrapper {
     margin: 1rem;

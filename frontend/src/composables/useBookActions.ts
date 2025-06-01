@@ -6,10 +6,14 @@ export function useBookActions() {
   const isSubmitting = ref(false)
   const books = ref([])
 
-  const fetchBooks = async () => {
+  const fetchBooks = async (titleFilter = '', authorFilter = '') => {
     try {
-        const response = await fetch(BASE_URL)
-        if (!response.ok) {
+      const queryParams = new URLSearchParams()
+      if (titleFilter) queryParams.append('title', titleFilter)
+      if (authorFilter) queryParams.append('author', authorFilter)
+
+      const response = await fetch(`${BASE_URL}?${queryParams.toString()}`)
+      if (!response.ok) {
         throw new Error('Failed to fetch books')
       }
       books.value = await response.json()
