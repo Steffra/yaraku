@@ -85,6 +85,27 @@ export function useBookActions() {
     }
   }
 
+  const exportBooks = async (fields: string[], format: string) => {
+    try {
+      const queryParams = new URLSearchParams()
+      fields.forEach((field) => queryParams.append('fields[]', field))
+
+      const response = await fetch(`${BASE_URL}/export/${format}?${queryParams.toString()}`)
+      if (!response.ok) {
+        throw new Error('Failed to export data')
+      }
+
+      const blob = await response.blob()
+      const link = document.createElement('a')
+      link.href = URL.createObjectURL(blob)
+      link.download = `export.${format}`
+      link.click()
+    } catch (error) {
+      console.error('Error exporting data:', error)
+      alert('Failed to export data. Please try again.')
+    }
+  }
+
   return {
     isSubmitting,
     books,
@@ -92,5 +113,6 @@ export function useBookActions() {
     createBook,
     editBook,
     deleteBook,
+    exportBooks,
   }
 }

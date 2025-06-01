@@ -1,20 +1,25 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
 import { ref, watch } from 'vue'
-import { NButton, NTable, NCard, NModal, NInput } from 'naive-ui';
+import { NButton, NTable, NCard, NModal, NInput, NRadioGroup, NRadioButton } from 'naive-ui'
 import { useBookActions } from './composables/useBookActions'
 import HelloWorld from './components/HelloWorld.vue'
 import BookModal from './components/BookModal.vue'
 import DeleteBookConfirmation from './components/DeleteBookConfirmation.vue'
+import ExportModal from './components/ExportModal.vue'
 
 const { books, fetchBooks, } = useBookActions()
-const modalMode = ref(null)
+const modalMode = ref('')
 const selectedBook = ref(null)
 const isDeleteModalVisible = ref(false)
+const isExportModalVisible = ref(false)
+
 const titleFilter = ref('')
 const authorFilter = ref('')
 const sortBy = ref('')
 const sortOrder = ref('asc')
+const exportOption = ref('title')
+const exportFormat = ref('csv')
 
 const openCreateModal = () => {
   modalMode.value = 'create'
@@ -31,10 +36,15 @@ const openDeleteModal = (book) => {
   isDeleteModalVisible.value = true
 }
 
+const openExportModal = () => {
+  isExportModalVisible.value = true
+}
+
 const closeModals = () => {
   isDeleteModalVisible.value = false
-  modalMode.value = null
+  modalMode.value = ''
   selectedBook.value = null
+  isExportModalVisible.value = false
   refreshList()
 }
 
@@ -62,6 +72,9 @@ watch([titleFilter, authorFilter, sortBy, sortOrder], ([newTitle, newAuthor, new
       <div class="create-button-wrapper">
         <n-button secondary type="primary" size="large" @click="openCreateModal">
           New book
+        </n-button>
+        <n-button secondary type="default" size="large" @click="openExportModal">
+          Export
         </n-button>
       </div>
       <n-table :bordered="true" :single-line="false">
@@ -99,16 +112,20 @@ watch([titleFilter, authorFilter, sortBy, sortOrder], ([newTitle, newAuthor, new
         </tbody>
       </n-table>
     </main>
-    <BookModal
-      v-if="modalMode !== null"
-      :show="modalMode !== null"
+      <BookModal
+      :show="modalMode !== ''"
       :mode="modalMode"
       :book="selectedBook"
       @close="closeModals"
     />
+    
     <DeleteBookConfirmation
       :show="isDeleteModalVisible"
       :book="selectedBook"
+      @close="closeModals"
+    />
+    <ExportModal
+      :show="isExportModalVisible"
       @close="closeModals"
     />
 </template>
@@ -127,7 +144,7 @@ main {
     margin: 1rem;
     width:100%;
     display:flex;
-    justify-content: end;
+    justify-content: space-between;
   }
 
   table { 
