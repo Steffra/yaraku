@@ -6,11 +6,13 @@ export function useBookActions() {
   const isSubmitting = ref(false)
   const books = ref([])
 
-  const fetchBooks = async (titleFilter = '', authorFilter = '') => {
+  const fetchBooks = async (titleFilter = '', authorFilter = '', sortBy = '', sortOrder = 'asc') => {
     try {
       const queryParams = new URLSearchParams()
       if (titleFilter) queryParams.append('title', titleFilter)
       if (authorFilter) queryParams.append('author', authorFilter)
+      if (sortBy) queryParams.append('sortBy', sortBy)
+      queryParams.append('sortOrder', sortOrder)
 
       const response = await fetch(`${BASE_URL}?${queryParams.toString()}`)
       if (!response.ok) {

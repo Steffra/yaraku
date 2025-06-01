@@ -13,6 +13,9 @@ const selectedBook = ref(null)
 const isDeleteModalVisible = ref(false)
 const titleFilter = ref('')
 const authorFilter = ref('')
+const sortBy = ref('')
+const sortOrder = ref('asc')
+
 const openCreateModal = () => {
   modalMode.value = 'create'
   selectedBook.value = null
@@ -36,10 +39,19 @@ const closeModals = () => {
 }
 
 const refreshList = () => {
-  fetchBooks(titleFilter.value, authorFilter.value)
+  fetchBooks(titleFilter.value, authorFilter.value, sortBy.value, sortOrder.value)
 }
 
-watch([titleFilter, authorFilter], ([newTitle, newAuthor]) => {
+const toggleSort = (column) => {
+  if (sortBy.value === column) {
+    sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc'
+  } else {
+    sortBy.value = column
+    sortOrder.value = 'asc'
+  }
+}
+
+watch([titleFilter, authorFilter, sortBy, sortOrder], ([newTitle, newAuthor, newSortBy, newSortOrder]) => {
   refreshList()
 }, { immediate: true })
 
@@ -54,21 +66,27 @@ watch([titleFilter, authorFilter], ([newTitle, newAuthor]) => {
       </div>
       <n-table :bordered="true" :single-line="false">
         <thead>
-          <tr>
-            <th>
-              <n-input v-model:value="titleFilter" placeholder="Title filter" width="100%" />
-            </th>
-            <th>
-              <n-input v-model:value="authorFilter" placeholder="Author filter" />
-            </th>
-            <th></th>
-          </tr>
-          <tr>
-            <th>Title</th>
-            <th>Author</th>
-            <th></th>
-          </tr>
-        </thead>
+        <tr>
+          <th>
+            <n-input v-model:value="titleFilter" placeholder="Title filter" :clearable="true" />
+          </th>
+          <th>
+            <n-input v-model:value="authorFilter" placeholder="Author filter" :clearable="true"/>
+          </th>
+          <th></th>
+        </tr>
+        <tr>
+          <th @click="toggleSort('title')" class="sortable">
+            Title
+            <span v-if="sortBy === 'title'">{{ sortOrder === 'asc' ? '▲' : '▼' }}</span>
+          </th>
+          <th @click="toggleSort('author')" class="sortable">
+            Author
+            <span v-if="sortBy === 'author'">{{ sortOrder === 'asc' ? '▲' : '▼' }}</span>
+          </th>
+          <th></th>
+        </tr>
+      </thead>
         <tbody v-if="books.length > 0">
           <tr v-for="book in books" :key="book.id">
             <td>{{ book.title }}</td>
@@ -109,14 +127,17 @@ main {
     margin: 1rem;
     width:100%;
     display:flex;
-    justify-content: start;
+    justify-content: end;
   }
 
   table { 
     width:100%;
 
     thead {
-      font-style: bold !important;
+      th {
+        font-weight: bold; 
+      }
+
       th:last-child {
         width: 110px;
       }
@@ -128,5 +149,19 @@ main {
       }
     }
   } 
+}
+
+.sortable {
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+  text-align: left;
+}
+
+.sortable span {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
 }
 </style>
