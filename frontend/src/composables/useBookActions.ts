@@ -1,6 +1,6 @@
 import { ref } from 'vue'
 
-const BASE_URL = 'http://localhost:8080/api/books'
+const BASE_URL = 'api/books'
 
 export function useBookActions() {
   const isSubmitting = ref(false)
@@ -45,7 +45,6 @@ export function useBookActions() {
       isSubmitting.value = false
     }
   }
-
 
   const editBook = async (id: string, title: string, author: string) => {
     isSubmitting.value = true
