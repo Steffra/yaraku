@@ -25,7 +25,7 @@ services:
     volumes:
       - ./frontend:/app
     ports:
-      - '80:5173'
+      - '5173:5173'
     command: >
       sh -c "
       npm install &&

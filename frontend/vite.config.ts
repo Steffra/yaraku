@@ -8,7 +8,6 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 export default defineConfig({
   plugins: [
     vue(),
-    vueDevTools(),
   ],
   resolve: {
     alias: {
@@ -16,6 +15,7 @@ export default defineConfig({
     },
   },
   server: {
+    origin: 'https://yaraku.app',
     proxy: {
       '^/api': {
           target: 'http://laravel:80',
