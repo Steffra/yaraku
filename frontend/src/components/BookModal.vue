@@ -2,6 +2,7 @@
 import { ref, watch } from 'vue'
 import { NButton, NInput, NForm, NFormItem, NCard, NModal } from 'naive-ui'
 import { useBookActions } from '../composables/useBookActions'
+import type { FormRules } from 'naive-ui'
 
 const props = defineProps({
   show: Boolean,
@@ -19,27 +20,28 @@ const emit = defineEmits(['close'])
 
 const { isSubmitting, createBook, editBook } = useBookActions()
 
-const title = ref('')
-const author = ref('')
+const model = ref({ title: '', author:''})
 const isModalVisible = ref(false)
+const formRef = ref<InstanceType<typeof NForm> | null>(null)
 
 const closeModal = () => {
   emit('close')
-  title.value = ''
-  author.value = ''
+  model.value.title = ''
+  model.value.author = ''
 }
 
 const handleSubmit = async () => {
-  if (!title.value || !author.value) {
-    alert('Both title and author are required.')
-    return
-  }
+  await formRef.value?.validate((errors) => {
+    if(errors && errors.length > 0) {
+      return
+    }
+  })
 
   try {
     if (props.mode === 'create') {
-      await createBook(title.value, author.value)
+      await createBook(model.value.title, model.value.author)
     } else if (props.mode === 'edit' && props.book) {
-      await editBook(props.book.id, title.value, author.value)
+      await editBook(props.book.id, model.value.title, model.value.author)
     }
     closeModal()
   } catch (error) {
@@ -52,11 +54,11 @@ watch(
   (newValue) => {
     isModalVisible.value = newValue
     if (props.mode === 'edit' && props.book) {
-      title.value = props.book.title || ''
-      author.value = props.book.author || ''
+      model.value.title = props.book.title || ''
+      model.value.author = props.book.author || ''
     } else {
-      title.value = ''
-      author.value = ''
+      model.value.title = ''
+      model.value.author = ''
     }
   },
   { immediate: true }
@@ -69,23 +71,42 @@ watch(
     }
   }
 )
+
+const rules: FormRules = {
+      title: {
+        required: true,
+        trigger:['input', 'blur'],
+        renderMessage: () => {
+          return 'Title is required'
+        }
+      },
+      author: {
+        required: true,
+        trigger:['input', 'blur'],
+        renderMessage: () => {
+          return 'Author is required'
+        }
+      }
+    }
 </script>
 
 <template>
   <n-modal :preset="'dialog'" v-model:show="isModalVisible" @close="closeModal">
     <n-card :title="props.mode === 'create' ? 'Add New Book' : 'Edit Book'" :bordered="false">
-      <n-form-item label="Title">
-        <n-input v-model:value="title" placeholder="Enter book title" :disabled="props.mode === 'edit'" :required="true" />
-      </n-form-item>
-      <n-form-item label="Author">
-        <n-input v-model:value="author" placeholder="Enter book author" />
-      </n-form-item>
-      <div class="footer">
-        <n-button type="tertiary" @click="closeModal">Cancel</n-button>
-        <n-button secondary type="primary" :loading="isSubmitting" :disabled="isSubmitting" @click="handleSubmit">
-          {{ props.mode === 'create' ? 'Submit' : 'Update' }}
-        </n-button>
-      </div>
+      <n-form :model="model" :rules="rules" ref="formRef">
+        <n-form-item label="Title" path="title">
+          <n-input v-model:value="model.title" placeholder="Enter book title" :disabled="props.mode === 'edit'" :required="true" />
+        </n-form-item>
+        <n-form-item label="Author" path="author">
+          <n-input v-model:value="model.author" placeholder="Enter book author" />
+        </n-form-item>
+        <div class="footer">
+          <n-button type="tertiary" @click="closeModal">Cancel</n-button>
+          <n-button secondary type="primary" :loading="isSubmitting" :disabled="isSubmitting" @click="handleSubmit">
+            {{ props.mode === 'create' ? 'Submit' : 'Update' }}
+          </n-button>
+        </div>
+      </n-form>
     </n-card>
   </n-modal>
 </template>
