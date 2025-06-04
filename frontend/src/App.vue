@@ -41,6 +41,7 @@ const closeModals = () => {
   modalMode.value = ''
   selectedBook.value = null
   isExportModalVisible.value = false
+  document.body.focus()
   refreshList()
 }
 
