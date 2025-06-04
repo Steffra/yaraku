@@ -93,7 +93,7 @@ const rules: FormRules = {
 <template>
   <n-modal :preset="'dialog'" v-model:show="isModalVisible" @close="closeModal">
     <n-card :title="props.mode === 'create' ? 'Add New Book' : 'Edit Book'" :bordered="false">
-      <n-form :model="model" :rules="rules" ref="formRef">
+      <n-form :model="model" :rules="rules" ref="formRef" @keydown.enter.prevent="handleSubmit">
         <n-form-item label="Title" path="title">
           <n-input v-model:value="model.title" placeholder="Enter book title" :disabled="props.mode === 'edit'" :required="true" />
         </n-form-item>
