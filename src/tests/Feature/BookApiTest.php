@@ -16,12 +16,6 @@ class BookApiTest extends TestCase
         $this->artisan('db:seed');
     }
 
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-        $this->artisan('db:seed');
-    }    
-
     public function test_it_can_list_all_books()
     {
         $response = $this->get('/api/books');
