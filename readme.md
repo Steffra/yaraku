@@ -1,31 +1,56 @@
-## Requirements
+# Yaraku Coding Solution
+
+**Live demo:** [https://yaraku.app](https://yaraku.app)
+
+## Setup Locally
+
+### Prerequisites
+
 - [Docker](https://docs.docker.com/install)
-- [Docker Compose](https://docs.docker.com/compose/install)
+- [Docker Compose](https://docs.docker.com/compose/install)
 
-## Setup
-1. Clone the repository.
-1. Start the containers by running `docker-compose up -d` in the project root.
-1. Install the composer packages by running `docker-compose exec laravel composer install`.
-1. Access the Laravel instance on `http://localhost` (If there is a "Permission denied" error, run `docker-compose exec laravel chown -R www-data storage`).
+### Installation
 
-Note that the changes you make to local files will be automatically reflected in the container. 
+Clone the repository and bring the stack up:
 
-## Persistent database
-If you want to make sure that the data in the database persists even if the database container is deleted, add a file named `docker-compose.override.yml` in the project root with the following contents.
+```bash
+git clone https://github.com/Steffra/yaraku.git bertold_krausz_yaraku_assignment
+cd bertold_krausz_yaraku_assignment
+docker-compose up -d
+docker-compose exec laravel bash setup.sh
 ```
-version: "3.7"
+When the script finishes the UI is available at [localhost:5173](http://localhost:5173).
 
-services:
-  mysql:
-    volumes:
-    - mysql:/var/lib/mysql
+## Project Overview
 
-volumes:
-  mysql:
+### Infrastructure
+
+The application is containerised with **docker‑compose**.  
+In addition to the pre‑provided services, a dedicated **frontend** image was added so the Vue client runs in its own container.
+
+A demo instance is hosted on a DigitalOcean droplet behind a Caddy reverse proxy.  
+The domain **yaraku.app** was purchased solely for this assignment.
+
+### Stack
+
+- A  **Laravel** backend exposing a **REST API**
+- A **Vue 3** frontend powered by **Vite**
+
+## Testing
+
+### Backend
+
+```bash
+docker-compose exec laravel php vendor/bin/phpunit
 ```
-Then run the following.
+Add `--coverage-html coverage-report` to generate a coverage report.
+
+### Frontend 
+```bash
+docker-compose exec frontend npx vitest run
 ```
-docker-compose stop \
-  && docker-compose rm -f mysql \
-  && docker-compose up -d
-``` 
+
+## Deployment
+After provisioning a server with a public IP, opening port 443, registering a domain, and installing SSL certificates, deploy the stack using the **same command as during installation**.
+
+The frontend listens on port 5173; point your reverse proxy (e.g. Nginx, Caddy, Traefik) to that port.
