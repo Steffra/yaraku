@@ -51,9 +51,9 @@ watch(
         <n-radio value="author" label="Authors"></n-radio>
       </n-radio-group>
       <div class="footer">
-        <n-button type="primary" @click="handleExport('csv')">Export as CSV</n-button>
+        <n-button type="primary" @click="handleExport('csv')">⬇ Export as CSV</n-button>
         <span>or</span>
-        <n-button type="primary" @click="handleExport('xml')">Export as XML</n-button>
+        <n-button type="primary" @click="handleExport('xml')">⬇ Export as XML</n-button>
       </div>  
     </n-card>
   </n-modal>

@@ -68,10 +68,10 @@ watch([titleFilter, authorFilter, sortBy, sortOrder], () => {
     <main >
       <div class="create-button-wrapper">
         <n-button secondary type="primary" size="large" @click="openCreateModal">
-          New book
+          + New book
         </n-button>
         <n-button secondary type="default" size="large" @click="openExportModal">
-          Export
+          Export 🗐
         </n-button>
       </div>
       <n-table :bordered="true" :single-line="false">
