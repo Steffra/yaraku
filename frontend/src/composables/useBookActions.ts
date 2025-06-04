@@ -9,8 +9,8 @@ export function useBookActions() {
   const fetchBooks = async (titleFilter = '', authorFilter = '', sortBy = '', sortOrder = 'asc') => {
     try {
       const queryParams = new URLSearchParams()
-      if (titleFilter) queryParams.append('title', titleFilter)
-      if (authorFilter) queryParams.append('author', authorFilter)
+      if (titleFilter) queryParams.append('title', encodeURIComponent(titleFilter))
+      if (authorFilter) queryParams.append('author', encodeURIComponent(authorFilter))
       if (sortBy) queryParams.append('sortBy', sortBy)
       queryParams.append('sortOrder', sortOrder)
 
@@ -33,7 +33,7 @@ export function useBookActions() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ title, author }),
+        body: JSON.stringify({ title:encodeURIComponent(title), author:encodeURIComponent(author) }),
       })
       if (!response.ok) {
         throw new Error('Failed to create book')
@@ -54,7 +54,7 @@ export function useBookActions() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ title, author }),
+        body: JSON.stringify({ title:encodeURIComponent(title), author:encodeURIComponent(author) }),
       })
       if (!response.ok) {
         throw new Error('Failed to update book')

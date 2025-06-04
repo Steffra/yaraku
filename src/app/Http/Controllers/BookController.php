@@ -22,6 +22,8 @@ class BookController extends Controller
 
     public function index(Request $request)
     {
+        $request->merge(array_map('urldecode', $request->all()));
+
         $sortBy = $request->query('sortBy', 'id');
         $sortOrder = $request->query('sortOrder', 'asc'); 
         
@@ -48,6 +50,9 @@ class BookController extends Controller
             'title' => 'required|string|max:255',
             'author' => 'required|string|max:255',
         ]);
+
+        $request->merge(array_map('urldecode', $request->all()));
+
         $book = $this->bookService->createBook($request->all());
         return response()->json($book, 201);
     }
@@ -70,10 +75,13 @@ class BookController extends Controller
     public function update(Request $request, $id)
     {
 
+        
         $this->validate($request, [
             'author' => 'required|string|max:255',
         ]);
-
+        
+        $request->merge(array_map('urldecode', $request->all()));
+        
         $validator = Validator::make(['id' => $id], [
             'id' => 'required|integer|exists:books,id',
         ]);
