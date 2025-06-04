@@ -1,9 +1,7 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
 import { ref, watch } from 'vue'
-import { NButton, NTable, NCard, NModal, NInput, NRadioGroup, NRadioButton } from 'naive-ui'
+import { NButton, NTable, NInput,  } from 'naive-ui'
 import { useBookActions } from './composables/useBookActions'
-import HelloWorld from './components/HelloWorld.vue'
 import BookModal from './components/BookModal.vue'
 import DeleteBookConfirmation from './components/DeleteBookConfirmation.vue'
 import ExportModal from './components/ExportModal.vue'
@@ -18,8 +16,6 @@ const titleFilter = ref('')
 const authorFilter = ref('')
 const sortBy = ref('')
 const sortOrder = ref('asc')
-const exportOption = ref('title')
-const exportFormat = ref('csv')
 
 const openCreateModal = () => {
   modalMode.value = 'create'
