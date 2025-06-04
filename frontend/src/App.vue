@@ -58,7 +58,7 @@ const toggleSort = (column) => {
   }
 }
 
-watch([titleFilter, authorFilter, sortBy, sortOrder], ([newTitle, newAuthor, newSortBy, newSortOrder]) => {
+watch([titleFilter, authorFilter, sortBy, sortOrder], () => {
   refreshList()
 }, { immediate: true })
 
